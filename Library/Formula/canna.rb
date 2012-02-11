@@ -35,8 +35,10 @@ class Canna < Formula
     ln_sf HOMEBREW_PREFIX+"include", include+"canna"
 
     system "install -c -m 755 update-canna-dics-dir #{prefix}/sbin/"
-    #system "install -c -m 644 hosts.canna #{etc}/canna/"
-    #system "install -c -m 755 misc/rc.canna #{etc}/canna/"
+
+    system "install -d -m 755 #{etc}/canna"
+    system "install -c -m 644 hosts.canna #{etc}/canna/"
+    system "install -c -m 755 misc/rc.canna #{etc}/canna/"
 
     #system "install -d -m 755 #{var}/lib/canna/dics.d"
     #system "mv #{var}/lib/canna/dic/canna/dics.dir #{var}/lib/canna/dics.d/00default"
