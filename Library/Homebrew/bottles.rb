@@ -1,23 +1,20 @@
 require 'tab'
 require 'extend/ARGV'
 
-def bottle_filename f
-  "#{f.name}-#{f.version}#{bottle_native_suffix}"
+def bottle_filename f, bottle_version=nil
+  name = f.name.downcase
+  version = f.stable.version
+  bottle_version ||= f.bottle.revision.to_i
+  "#{name}-#{version}#{bottle_native_suffix(bottle_version)}"
 end
 
 def bottles_supported?
-  HOMEBREW_PREFIX.to_s == '/usr/local' and HOMEBREW_CELLAR.to_s == '/usr/local/Cellar'
+  HOMEBREW_PREFIX.to_s == '/usr/local' and HOMEBREW_CELLAR.to_s == '/usr/local/Cellar' and Hardware.is_64_bit? || !MacOS.snow_leopard?
 end
 
 def install_bottle? f
-  !ARGV.build_from_source? && bottle_current?(f) && bottle_native?(f)
-end
-
-def bottle_native? f
-  return true if bottle_native_regex.match(f.bottle_url)
-  # old brew bottle style
-  return true if MacOS.lion? && old_bottle_regex.match(f.bottle_url)
-  return false
+  return true if ARGV.include? '--install-bottle'
+  not ARGV.build_from_source? and bottle_current?(f)
 end
 
 def built_bottle? f
@@ -25,25 +22,47 @@ def built_bottle? f
 end
 
 def bottle_current? f
-  !f.bottle_url.nil? && Pathname.new(f.bottle_url).version == f.version
+  f.bottle and f.bottle.url && !f.bottle.checksum.empty? && f.bottle.version == f.stable.version
 end
 
-def bottle_native_suffix
-  ".#{MacOS.cat}#{bottle_suffix}"
+def bottle_file_outdated? f, file
+  filename = file.basename.to_s
+  return nil unless (filename.match(bottle_regex) or filename.match(old_bottle_regex)) and f.bottle and f.bottle.url
+
+  bottle_ext = filename.match(bottle_native_regex).captures.first rescue nil
+  bottle_ext ||= filename.match(old_bottle_regex).captures.first rescue nil
+  bottle_url_ext = f.bottle.url.match(bottle_native_regex).captures.first rescue nil
+  bottle_url_ext ||= f.bottle.url.match(old_bottle_regex).captures.first rescue nil
+
+  bottle_ext && bottle_url_ext && bottle_ext != bottle_url_ext
 end
 
-def bottle_suffix
-  ".bottle.tar.gz"
+def bottle_new_version f
+  return 0 unless bottle_current? f
+  f.bottle.revision + 1
+end
+
+def bottle_native_suffix version=nil
+  ".#{MacOS.cat}#{bottle_suffix(version)}"
+end
+
+def bottle_suffix version=nil
+  version = version.to_i > 0 ? ".#{version}" : ""
+  ".bottle#{version}.tar.gz"
 end
 
 def bottle_native_regex
-  /(\.#{MacOS.cat}\.bottle\.tar\.gz)$/
+  /(\.#{MacOS.cat}\.bottle\.(\d+\.)?tar\.gz)$/
 end
 
 def bottle_regex
-  /(\.[a-z]+\.bottle\.tar\.gz)$/
+  /(\.[a-z]+\.bottle\.(\d+\.)?tar\.gz)$/
 end
 
 def old_bottle_regex
-  /(-bottle\.tar\.gz)$/
+  /((\.[a-z]+)?[\.-]bottle\.tar\.gz)$/
+end
+
+def bottle_base_url
+  "https://downloads.sf.net/project/machomebrew/Bottles/"
 end

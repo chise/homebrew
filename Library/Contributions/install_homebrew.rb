@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby
 # This script installs to /usr/local only. To install elsewhere you can just
 # untar https://github.com/mxcl/homebrew/tarball/master anywhere you like.
 
@@ -132,4 +132,5 @@ else
 end
 
 ohai "Installation successful!"
+puts "You should run `brew doctor' *before* you install anything."
 puts "Now type: brew help"

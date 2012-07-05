@@ -2,10 +2,11 @@ require 'formula'
 
 class Ffmbc < Formula
   homepage 'http://code.google.com/p/ffmbc/'
-  url 'http://ffmbc.googlecode.com/files/FFmbc-0.7-rc5.tar.bz2'
-  md5 '42881eaf4f012c0d32f1bebde2bbb70d'
+  url 'http://ffmbc.googlecode.com/files/FFmbc-0.7-rc7.tar.bz2'
+  md5 '547bb7b7963224dd66dffa8b25e623b3'
 
   depends_on 'yasm' => :build
+  depends_on :x11
   depends_on 'x264' => :optional
   depends_on 'faac' => :optional
   depends_on 'lame' => :optional
@@ -16,7 +17,6 @@ class Ffmbc < Formula
   depends_on 'xvid' => :optional
 
   def install
-    ENV.x11
     args = ["--prefix=#{prefix}",
             "--disable-debug",
             "--disable-shared",
@@ -57,6 +57,6 @@ class Ffmbc < Formula
   end
 
   def test
-    system "#{bin}/ffmbc -h"
+    system "#{bin}/ffmbc", "-h"
   end
 end

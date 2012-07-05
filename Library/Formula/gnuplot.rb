@@ -2,13 +2,14 @@ require 'formula'
 
 class Gnuplot < Formula
   homepage 'http://www.gnuplot.info'
-  url 'http://downloads.sourceforge.net/project/gnuplot/gnuplot/4.4.4/gnuplot-4.4.4.tar.gz'
-  md5 '97a43328e81e57ebed7f135ca0c07e82'
+  url 'http://downloads.sourceforge.net/project/gnuplot/gnuplot/4.6.0/gnuplot-4.6.0.tar.gz'
+  md5 '8e6e92b4596ea0eb75e16a57fc79efec'
   head 'cvs://:pserver:anonymous@gnuplot.cvs.sourceforge.net:/cvsroot/gnuplot:gnuplot', :using => :cvs
 
   depends_on 'pkg-config' => :build
   depends_on 'readline'
   depends_on 'pango'
+  depends_on :x11
   depends_on 'pdflib-lite' if ARGV.include? "--pdf"
   depends_on 'lua' unless ARGV.include? '--nolua'
   depends_on 'gd' unless ARGV.include? "--nogd"
@@ -30,7 +31,6 @@ class Gnuplot < Formula
 
   def install
     # Help configure find libraries
-    ENV.x11
     readline = Formula.factory 'readline'
     pdflib = Formula.factory 'pdflib-lite'
     gd = Formula.factory 'gd'
@@ -56,6 +56,6 @@ class Gnuplot < Formula
   end
 
   def test
-    system "#{bin}/gnuplot --version"
+    system "#{bin}/gnuplot", "--version"
   end
 end

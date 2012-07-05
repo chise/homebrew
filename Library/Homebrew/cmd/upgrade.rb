@@ -29,14 +29,16 @@ module Homebrew extend self
       end
     end
 
-    # Expand the outdated list to include outdated dependencies then sort and
-    # reduce such that dependencies are installed first and installation is not
-    # attempted twice. Sorting is implicit the way `recursive_deps` returns
-    # root dependencies at the head of the list and `uniq` keeps the first
-    # element it encounters and discards the rest.
-    outdated.map!{ |f| f.recursive_deps.reject{ |d| d.installed?} << f }
-    outdated.flatten!
-    outdated.uniq!
+    unless ARGV.include? '--ignore-dependencies'
+      # Expand the outdated list to include outdated dependencies then sort and
+      # reduce such that dependencies are installed first and installation is not
+      # attempted twice. Sorting is implicit the way `recursive_deps` returns
+      # root dependencies at the head of the list and `uniq` keeps the first
+      # element it encounters and discards the rest.
+      outdated.map!{ |f| f.recursive_deps.reject{ |d| d.installed?} << f }
+      outdated.flatten!
+      outdated.uniq!
+    end
 
     if outdated.length > 1
       oh1 "Upgrading #{outdated.length} outdated package#{outdated.length.plural_s}, with result:"
@@ -49,10 +51,12 @@ module Homebrew extend self
   end
 
   def upgrade_formula f
+    tab = Tab.for_formula(f)
     outdated_keg = Keg.new(f.linked_keg.realpath) rescue nil
 
-    installer = FormulaInstaller.new f
+    installer = FormulaInstaller.new(f, tab)
     installer.show_header = false
+    installer.install_bottle = install_bottle?(f) and tab.used_options.empty?
 
     oh1 "Upgrading #{f.name}"
 
@@ -65,10 +69,11 @@ module Homebrew extend self
     installer.caveats
     installer.finish
   rescue CannotInstallFormulaError => e
-    onoe e
+    ofail e
   rescue BuildError => e
     e.dump
     puts
+    Homebrew.failed = true
   ensure
     # restore previous installation state if build failed
     outdated_keg.link if outdated_keg and not f.installed? rescue nil

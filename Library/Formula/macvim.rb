@@ -1,5 +1,20 @@
 require 'formula'
 
+class Ruby18x < Requirement
+  def message; <<-EOS.undent
+    MacVim compiles against whatever Ruby it finds in your path, and has
+    problems working with Ruby 1.9. We've detected Ruby 1.9 in your path,
+    so this compile may fail.
+    EOS
+  end
+  def fatal?
+    false
+  end
+  def satisfied?
+    `ruby --version` =~ /1\.8\.\d/
+  end
+end
+
 class Macvim < Formula
   homepage 'http://code.google.com/p/macvim/'
   url 'https://github.com/b4winckler/macvim/tarball/snapshot-64'
@@ -13,10 +28,13 @@ class Macvim < Formula
     ["--custom-icons", "Try to generate custom document icons."],
     ["--with-cscope", "Build with Cscope support."],
     ["--override-system-vim", "Override system vim."],
+    ["--with-lua", "Build with Lua scripting support."]
   ]
   end
 
+  depends_on Ruby18x.new
   depends_on 'cscope' if ARGV.include? '--with-cscope'
+  depends_on 'lua' if ARGV.include? '--with-lua'
 
   def install
     # MacVim's Xcode project gets confused by $CC, so remove it
@@ -42,6 +60,11 @@ class Macvim < Formula
 
     args << "--enable-cscope" if ARGV.include? "--with-cscope"
 
+    if ARGV.include? "--with-lua"
+      args << "--enable-luainterp"
+      args << "--with-lua-prefix=#{HOMEBREW_PREFIX}"
+    end
+
     system "./configure", *args
 
     # Building custom icons fails for many users, so off by default.
@@ -51,7 +74,9 @@ class Macvim < Formula
     end
 
     # Reference: https://github.com/b4winckler/macvim/wiki/building
-    system "cd src/MacVim/icons && make getenvy"
+    cd 'src/MacVim/icons' do
+      system "make getenvy"
+    end
 
     system "make"
 

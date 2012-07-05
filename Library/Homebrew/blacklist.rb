@@ -45,20 +45,16 @@ def blacklisted? name
     Although if you prefer, there is a formula in homebrew-alt.
     EOS
   when 'npm' then <<-EOS.undent
-    npm can be installed thusly by following the instructions at
-      http://npmjs.org/
+    Homebrew does not provide npm because it is self-updating. To install it, first
+    `brew install nodejs' and then:
 
-    To do it in one line, use this command:
-      curl http://npmjs.org/install.sh | sh
+        curl http://npmjs.org/install.sh | sh
     EOS
   when /(lib)?lzma/
     "lzma is now part of the xz formula."
   when 'xcode' then <<-EOS.undent
-    Xcode can be installed via the App Store (on Lion), or from:
+    Xcode can be installed via the App Store (on Lion or newer), or from:
       http://connect.apple.com/
-
-    If you download from the App Store, make sure you run the installer
-    placed in /Applications after the download completes.
     EOS
   end
 end
