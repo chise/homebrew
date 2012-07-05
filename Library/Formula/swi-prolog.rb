@@ -2,8 +2,8 @@ require 'formula'
 
 class SwiProlog < Formula
   homepage 'http://www.swi-prolog.org/'
-  url 'http://www.swi-prolog.org/download/stable/src/pl-6.0.0.tar.gz'
-  sha256 '85591936c8b6af610b1a9960924e6e4eaf5abccf253749a15355ad79a9e80de9'
+  url 'http://www.swi-prolog.org/download/stable/src/pl-6.0.2.tar.gz'
+  sha256 '9dbc4d3aef399204263f168583e54468078528bff75c48c7895ae3efe5499b75'
   head 'git://www.swi-prolog.org/home/pl/git/pl.git'
 
   depends_on 'pkg-config' => :build
@@ -12,6 +12,7 @@ class SwiProlog < Formula
   depends_on 'jpeg'
   depends_on 'mcrypt'
   depends_on 'gawk'
+  depends_on :x11 if x11_installed?
 
   # 10.5 versions of these are too old
   if MacOS.leopard?
@@ -33,11 +34,9 @@ class SwiProlog < Formula
     args = ["--prefix=#{prefix}", "--mandir=#{man}"]
     ENV.append 'DISABLE_PKGS', "jpl" if ARGV.include? "--without-jpl"
 
-    if x11_installed?
+    unless x11_installed?
       # SWI-Prolog requires X11 for XPCE
-      ENV.x11
-    else
-      opoo  "It appears that X11 is not installed. The XPCE packages will not be built."
+      opoo "It appears that X11 is not installed. The XPCE packages will not be built."
       ENV.append 'DISABLE_PKGS', "xpce"
     end
 
