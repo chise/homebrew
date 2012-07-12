@@ -40,9 +40,41 @@ class Canna < Formula
     system "install -c -m 644 hosts.canna #{etc}/canna/"
     system "install -c -m 755 misc/rc.canna #{etc}/canna/"
 
+    system "mv #{etc}/canna/rc.canna #{etc}/canna/rc.canna-root"
+    system "sed 's/ -u canna / /' < #{etc}/canna/rc.canna-root > #{etc}/canna/rc.canna"
+    system "chmod 755 #{etc}/canna/rc.canna"
+    plist_path.write startup_plist
+    plist_path.chmod 0644
+
     #system "install -d -m 755 #{var}/lib/canna/dics.d"
     #system "mv #{var}/lib/canna/dic/canna/dics.dir #{var}/lib/canna/dics.d/00default"
     #system "touch #{var}/lib/canna/dic/canna/dics.dir"
+  end
+
+  def startup_plist
+    return <<-EOPLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>KeepAlive</key>
+  <true/>
+  <key>Label</key>
+  <string>#{plist_name}</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>#{HOMEBREW_PREFIX}/etc/canna/rc.canna</string>
+    <string>start</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>WorkingDirectory</key>
+  <string>#{HOMEBREW_PREFIX}</string>
+  <key>StandardErrorPath</key>
+  <string>#{var}/log/canna/server.log</string>
+</dict>
+</plist>
+    EOPLIST
   end
 
   def test
