@@ -51,6 +51,27 @@ class Canna < Formula
     #system "touch #{var}/lib/canna/dic/canna/dics.dir"
   end
 
+  def caveats; <<-EOS.undent
+    To run as, for instance, user "canna", you may need to `sudo`:
+        sudo #{etc}/canna/rc.canna-root start
+
+    Start Canna manually with:
+        #{etc}/canna/rc.canna start
+
+    To launch on startup:
+    * if this is your first install:
+        mkdir -p ~/Library/LaunchAgents
+        cp #{plist_path} ~/Library/LaunchAgents/
+        launchctl load -w ~/Library/LaunchAgents/#{plist_path.basename}
+
+    * if this is an upgrade and you already have the #{plist_path.basename} loaded:
+        launchctl unload -w ~/Library/LaunchAgents/#{plist_path.basename}
+        #{etc}/canna/rc.canna stop
+        cp #{plist_path} ~/Library/LaunchAgents/
+        launchctl load -w ~/Library/LaunchAgents/#{plist_path.basename}
+    EOS
+  end
+
   def startup_plist
     return <<-EOPLIST
 <?xml version="1.0" encoding="UTF-8"?>
