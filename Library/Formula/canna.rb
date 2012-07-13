@@ -4,7 +4,7 @@ class Canna < Formula
   homepage 'http://canna.sourceforge.jp/'
   url 'http://sourceforge.jp/frs/redir.php?m=jaist&f=%2Fcanna%2F9565%2FCanna37p3.tar.bz2'
   md5 '0b8c241f63ab4cd3c0b9be569456dc33'
-  version '3.7p3'
+  version '3.7p3_1'
 
   depends_on 'imake' => :build
 
@@ -146,8 +146,8 @@ diff -Naur Canna37p3.orig/Canna.conf Canna37p3/Canna.conf
  
 -cannaOwner = bin
 -cannaGroup = bin
-+cannaOwner = canna
-+cannaGroup = canna
++cannaOwner = daemon
++cannaGroup = daemon
  
  #ifdef InstallAsUser
  cannaOwnerGroup =
