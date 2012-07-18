@@ -4,7 +4,7 @@ class Canna < Formula
   homepage 'http://canna.sourceforge.jp/'
   url 'http://sourceforge.jp/frs/redir.php?m=jaist&f=%2Fcanna%2F9565%2FCanna37p3.tar.bz2'
   md5 '0b8c241f63ab4cd3c0b9be569456dc33'
-  version '3.7p3_1'
+  version '3.7p3_2'
 
   depends_on 'imake' => :build
 
@@ -79,7 +79,7 @@ class Canna < Formula
 <plist version="1.0">
 <dict>
   <key>KeepAlive</key>
-  <true/>
+  <false/>
   <key>Label</key>
   <string>#{plist_name}</string>
   <key>ProgramArguments</key>
